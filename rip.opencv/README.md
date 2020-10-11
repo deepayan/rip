@@ -44,7 +44,7 @@ from `cv::Mat` objects as necessary.
 Wrappers to OpenCV functions are exposed as `Rcpp` modules,
 specifically, as the environment `rip.cv`:
 
-```{r}
+```r
 ls(rip.cv)
 ```
 ```
@@ -55,7 +55,7 @@ ls(rip.cv)
 Each of these modules consist of related functions (except `enums`,
 which is a list of mnemonic codes), for example
 
-```{r}
+```r
 rip.cv$IO # after being initialized
 ```
 ```
