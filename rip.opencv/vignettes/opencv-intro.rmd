@@ -58,6 +58,8 @@ An `image()` method for `"rip"` objects can be used to plot it.
 ```{r,fig.height=5}
 image(v)
 ```
+\
+
 
 None of the above involves calling any OpenCV routines. Suppose we now
 want to use the OpenCV function
@@ -82,6 +84,8 @@ par(mfrow = c(1, 2))
 image(log(Mod(V)), main = "log-modulus of DFT coefficients")
 image(Arg(V), main = "argument of DFT coefficients")
 ```
+\
+
 
 # Using the `"rip"` object for image manipulation
 
@@ -141,6 +145,9 @@ N <- prod(dim(a)[1:2])
 red <- a; red[,,-1] <- runif(N, 0, 255); image(as.rip(red))
 green <- a; green[,,-2] <- runif(N, 0, 255); image(as.rip(green))
 ```
+\
+
+
 
 Similar methods are also available to convert to and from `"raster"`
 objects, including imported using the `png` and `jpeg` packages (in
@@ -198,6 +205,9 @@ par(mfrow = c(1, 2))
 image(x, rescale = FALSE)
 image(255 - x, rescale = FALSE) # negative
 ```
+\
+
+
 
 ## Example: convert color image to grayscale
 
@@ -223,6 +233,9 @@ image(y1, rescale = FALSE, main = "decolor")
 image(y2, rescale = FALSE, main = "cvtColor")
 image(y1 - y2, rescale = TRUE, main = "difference")
 ```
+\
+
+
 
 The `cv::cvtColor()` function is designed for more general color space
 conversion, and can be used, for example, to go from the default BGR
@@ -237,6 +250,9 @@ x.hsv <- rip.cv$imgproc$cvtColor(x, convcodes["COLOR_BGR2HSV"])
 image(x.rgb)
 image(x.hsv)
 ```
+\
+
+
 
 ```{r,fig.width=10, fig.height=4}
 par(mfrow = c(1, 3))
@@ -244,6 +260,9 @@ image(rip.cv$photo$pencilSketch(x, color = TRUE, 80, 0.1, 0.02), rescale = FALSE
 image(y <- rip.cv$photo$edgePreservingFilter(x, 2L, 60), rescale = FALSE)
 image(rip.cv$photo$stylization(y, 60), rescale = FALSE)
 ```
+\
+
+
 
 
 ## Other modules
@@ -259,7 +278,9 @@ The choice of functions as well as their organization into modules are
 somewhat arbitrary, and details may change as the package evolves.
 Not all of these are well tested, and most are thin wrappers around
 OpenCV functions that take one or more `cv::Mat` objects as input and
-produce one as output.
+produce one as output. More routines may be added in future; an
+incomplete list of potential candidates are available
+[here](https://github.com/deepayan/rip/blob/main/rip.opencv/opencv-functions.md).
 
 It is of course perfectly reasonable to want operations that combine
 multiple OpenCV functions, especially those that involve structures
