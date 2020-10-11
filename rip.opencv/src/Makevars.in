@@ -1,0 +1,15 @@
+PKG_CPPFLAGS=@cflags@
+PKG_LIBS=@libs@
+CXX_STD=CXX11
+
+# all: clean
+
+# clean:
+#	rm -f $(SHLIB) $(OBJECTS)
+
+
+## Old pre-configure Makevars
+
+# PKG_LIBS = `pkg-config --libs opencv`
+# PKG_CFLAGS = `pkg-config --cflags opencv`
+# PKG_CXXFLAGS = `pkg-config --cflags opencv` `Rscript -e 'Rcpp:::CxxFlags()'`

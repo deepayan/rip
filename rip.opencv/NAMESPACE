@@ -1,0 +1,41 @@
+useDynLib(rip.opencv)
+
+importFrom(Rcpp, evalCpp)
+
+export(rip.cv) # environment with Rcpp modules
+
+## high-level interfaces to opencv functions rip.cv $ <module> $ <function>
+
+export(rip.import,     # IO $ imread
+       rip.export,     # IO $ imwrite
+       rip.desaturate, # photo $ decolor | imgproc $ cvtColor
+       rip.pad,        # misc $ copyMakeBorder
+       rip.resize,     # imgproc $ resize
+       rip.blur,       # filter $ medianBlur | GaussianBlur | blur
+       rip.flip,       # core $ flip
+       rip.filter,     # filter $ filter2D
+       rip.dft )       # transforms $ dft
+
+## utilities
+
+export(rip.shift, rip.ndft, rip.conv)
+export(nchannel)
+
+## Generic functions and methods
+
+export(as.rip)
+
+S3method(as.rip, default)
+S3method(as.rip, matrix)
+S3method(as.rip, array)
+S3method(as.rip, raster)
+S3method(as.rip, nativeRaster)
+
+S3method(as.raster, rip)
+S3method(as.array, rip)
+
+S3method(print, rip)
+S3method(plot, rip)
+S3method(image, rip)
+
+

@@ -1,0 +1,20 @@
+Package: rip.opencv
+Version: 0.1-1
+Date: 2020-10-10
+Type: Package
+Title: Interface to OpenCV Image Processing Routines
+Authors@R: c(person("Deepayan", "Sarkar", role = c("aut", "cre"),
+	            email = "deepayan.sarkar@r-project.org",
+		    comment = c(ORCID = "0000-0003-4107-1553")),
+              person("Kaustav", "Nandy", role = "aut",
+	             email = "kaustav.ndyy@gmail.com"))
+Description: Makes OpenCV routines available in R
+License: GPL-3
+SystemRequirements: OpenCV 3 or newer
+Imports: Rcpp (>= 0.11.0), RcppArmadillo (>= 0.4.000.2)
+Depends: Rcpp (>= 0.11.0), RcppArmadillo (>= 0.4.000.2)
+LinkingTo: Rcpp, RcppArmadillo
+Suggests: knitr
+VignetteBuilder: knitr
+URL: https://github.com/deepayan/rip/rip.opencv
+BugReports: https://github.com/deepayan/rip/issues
