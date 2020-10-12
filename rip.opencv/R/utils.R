@@ -104,7 +104,7 @@ rip.resize <-
     }
     else mscale <- min(fx, fy)
     if (missing(method))
-        method <- if (mscale < 1) "AREA" else "LINEAR"
+        method <- if (mscale < 1) "area" else "linear"
     else
         method <- match.arg(method)
     iflags <- rip.cv$enums$InterpolationFlags
@@ -176,6 +176,22 @@ rip.filter <-
 ## around that, rip.conv(). Use flip = FALSE for correlation filter.
 
 
+
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title Matlab style 2-D convolution
+##' @param x 'rip' object to be convolved
+##' @param k 'rip' object to be convolved with
+##' @param type shape parameter which determines the part of the
+##' 2-dimensional convolution to be returned. If \code{"full"}, the
+##' full convolution matrix is returned, for \code{"same"}, 'rip'
+##' object of same size as 'x' is returned, and in case of
+##' \code{"valid"}, only the part of the convolution that are without
+##' zero padded edges are returned.
+##' @param flip 
+##' @return Convolution of 'x' and 'k'
+##' @author kaustav nandy
 rip.conv <- function(x, k, type = c("full", "valid", "same"), flip = TRUE)
 {
     ## NOTE: Although cv::filter2D docs don't mention this explicitly,
