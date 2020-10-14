@@ -84,7 +84,8 @@ rip.deconvwnr <- function(y, k, S, N)
 }
 
 ## deconvolution / super-resolution using hyper-Laplacian and possibly
-## correlated gradient prior.
+## correlated gradient prior. Workhorse functions doing the actual
+## implementation are in sparse-matrix.R and conjugate-gradient.R
 
 ## Separate interfaces for denoising, deconvolution and
 ## super-resolution.
@@ -234,9 +235,7 @@ ktrim0odd <- function(k)
 }
 
 
-rip.deconv.channel <- function(y, k, FUN,
-                               alpha = 0.8, lambda = 0.01,
-                               rho = list(along = 0.3, across = 0.6),
+rip.deconv.channel <- function(y, k, FUN, alpha, lambda, rho,
                                patch, overlap, ..., super.factor = 1)
 {
     FUN(y, k, alpha = alpha,
@@ -252,20 +251,22 @@ rip.deconv.channel <- function(y, k, FUN,
 
 ##' Single-image non-blind deconvolution and super-resolution
 ##' (upscaling) using Gaussian and hyper-Lapacian image gradient
-##' priors.
+##' priors. Supports missing values (using the direct method only), as
+##' well as robust loss functions instead of squared error loss for
+##' image fidelity.
 ##'
 ##' These are the main functions of this package, supporting
 ##' single-image non-blind (known blur kernel) deconvolution and
 ##' super-resolution using a Bayesian regularization approach. As
 ##' blurring and downsampling are linear operations, the blurred image
-##' y can be expressed in terms of the latent image \code{x} as
-##' \code{y = T %*% x + error}, where \code{T} is a sparse matrix
+##' \code{y} can be expressed in terms of the latent image \code{x} as
+##' \code{y = T x + error}, where \code{T} is a sparse matrix
 ##' determined by \code{k}. However, the problem is generally
 ##' under-constrained, so requires regularization to solve. These
 ##' funtions assume the following prior on \code{x}: horizontal and
 ##' vertical lag-1 gradients are independent, marginally either
 ##' mean-zero Gaussian or hyper-Laplacian (density proportional to
-##' \code{exp(abs(x)^alpha}}), and possibly correlated according to a
+##' \code{exp(abs(x)^alpha)}), and possibly correlated according to a
 ##' simple 2-D lag-1 auto-regressive model.
 ##'
 ##' The estimate of \code{x} is the posterior mode, equivalent to a
@@ -290,12 +291,16 @@ rip.deconv.channel <- function(y, k, FUN,
 ##' Although \code{k} is assumed to be known, this is rarely true in
 ##' practice. Estimating complicated blur kernels is a difficult
 ##' problem not yet handled by this package, but external methods are
-##' available. A simple Fourier-domain method, assuming a symmetric
-##' kernel and Gaussian gradient prior, is implemented in
-##' \code{\link{symmetric.blur}}, and used when \code{kbw <
-##' 1}. Kernels in parametric form can be generated using
-##' \code{\link{make.kernel}}.
+##' available.
 ##'
+##' \code{rip.denoise} and \code{rip.upscale} are expected to work
+##' with images that have only mild burring, usually due to slight
+##' lack of focus or limitations of camera optics. A simple
+##' Fourier-domain method, assuming a symmetric kernel and Gaussian
+##' gradient prior, is implemented in \code{\link{symmetric.blur}},
+##' and used when \code{kbw < 1} for \code{rip.denoise} and
+##' \code{rip.upscale}. Kernels in parametric form can be generated
+##' using \code{\link{make.kernel}}.
 ##' 
 ##' @title Non-blind deconvolution and super-resolution
 ##' @param y The blurred and / or downscaled image to be
@@ -304,10 +309,10 @@ rip.deconv.channel <- function(y, k, FUN,
 ##'     three-channel) objects, and are split into individual channels
 ##'     before processing. Missing values (NA) are allowed, but only
 ##'     for \code{method = "direct"}.
-##' @param k The known blur kernel, a single-channel \code{"rip"}
-##'     object or matrix. Mandatory for \code{rip.deconv}, but
-##'     optional for \code{rip.denoise} and \code{rip.upscale}. See
-##'     details.
+##' @param k The known blur kernel applied to the latent image, a
+##'     single-channel \code{"rip"} object or matrix. Mandatory for
+##'     \code{rip.deconv}, but optional for \code{rip.denoise} and
+##'     \code{rip.upscale}. See details.
 ##' @param method Character string giving the method to be used for
 ##'     solving the linear equations derived from (weighted) least
 ##'     squares problems. The \code{"iterative"} method uses a
@@ -322,19 +327,94 @@ rip.deconv.channel <- function(y, k, FUN,
 ##'     of \code{k}, this may require large amounts of memory. Missing
 ##'     values in \code{y} are only supported for the \code{"direct"}
 ##'     method.
+##' @param alpha The hyper-Laplacian parameter. \code{alpha = 2}
+##'     corresponds to Gaussian, and \code{alpha = 1} to double
+##'     exponential or Laplacian. \code{alpha = 0.8} is commonly used
+##'     to model natural images, and often referred to as a "sparse"
+##'     prior because it puts relatively more weight to 0 gradients.
+##' @param lambda The regularization or tuning parameter.
+##' @param rho List with components \code{along} and \code{across}
+##'     specifying local dependence of gradients as a 2-D
+##'     auto-regressive process in terms of correlation along and
+##'     across the gradient direction. \code{along = 0.3} and
+##'     \code{across = 0.6} are good values to try.
 ##' @param patch Integer vector, replicated to be of length 2, giving
 ##'     the size of patches into which the input image is split to
 ##'     avoid processing large images.
 ##' @param overlap Integer vector, replicated to be of length 2,
 ##'     giving the amount of overlap between contiguous images.
 ##' @param ... Further arguments, to be passed on to the underlying
-##'     (unexported) workhorse functions. Supported arguments are:
+##'     (unexported) workhorse functions. Useful arguments are:
+##'
+##'     \describe{
+##' 
+##'     \item{\code{cache.dir}:}{ The name of a directory to store
+##'       cached sparse matrices. Used to store downscaling operators
+##'       if specified; by default they are computed as necessary (the
+##'       penalty is relatively small). }
+##'
+##'     \item{\code{yerror}:}{ Character string giving loss function
+##'       used to measure image fidelity. Possible values are
+##'       \code{"normal"} for squared error loss, \code{"huber"} for
+##'       Huber loss, \code{"bisquare"} for Tukey bisquare loss, and
+##'       \code{"poisson"} for squared error loss with variance
+##'       proportional to mean. The last option is not really useful,
+##'       as there is an arbitrary scale factor has no natural
+##'       estimate. }
+##'
+##'     \item{\code{huber.k = 1.345}:}{ Parameter for Huber loss. The
+##'       scale parameter is estimated using the MAD in each
+##'       iteration. }
+##' 
+##'     \item{\code{bisquare.c = 4.685}:}{ Parameter for bisquare
+##'       loss. The scale parameter is estimated using the MAD in each
+##'       iteration.  }
+##' 
+##'     \item{\code{wt.thres = 0.01}:}{ IRLS weights are restricted to
+##'     be no smaller than this, both for image error and
+##'     hyper-Lapacian prior weights.}
+##' 
+##'     \item{\code{niter.irls = 5}:}{ Number of IRLS iterations.  }
+##' 
+##'     \item{\code{verbose = FALSE}:}{ Logical flag; whether progress
+##'     should be indicated. Useful for long-running computations. }
+##'
+##'     \item{\code{cg.update}:}{ Character string giving type of
+##'       conjugate-gradient update (passed on to
+##'       \code{optim}). Possible values are \code{"FR"} for
+##'       Fletcher-Reeves (the default), \code{"PR"} for
+##'       Polak-Ribiere, and \code{"BS"} for
+##'       Beale-Sorenson. Polak-Ribiere is slightly slower than
+##'       Fletcher-Reeves but sometimes gives better results. }
+##' 
+##'     \item{\code{maxit}:}{ The maximum number of conjugate-gradient
+##'     iterations in \code{optim}. In fact, other components of the
+##'     \code{control} argument of \code{optim} can also be specified. }
+##' 
+##' 
+##' }
+##'
 ##' @param super.factor Integer, factor by which input image is to be
 ##'     upscaled.
+##' @param factor Integer, factor by which input image is to be
+##'     upscaled.
+##' @param kbw For \code{rip.denoise} and \code{rip.upscale}, a
+##'     numeric value giving the bandwidth (in units of pixels in the
+##'     input image) for an Epanechnikov kernel as constructed using
+##'     \code{\link{symmetric.blur}}. For \code{rip.upscale}, the
+##'     kernel that applies on the latent image has bandwidth
+##'     \code{kbw * factor}.  Two special values are \code{0} to
+##'     indicate no blurring and a negative value to estimate the
+##'     kernel from the image itself assuming a correlated gradient
+##'     prior. For the last case, explicitly using
+##'     \code{\link{symmetric.blur}} allows more control, especially
+##'     on the size of the kernel.
 ##' @return A \code{"rip"} object representing the estimate of the
 ##'     latent image.
 ##' 
 rip.deconv <- function(y, k, method = c("iterative", "direct"),
+                       alpha = 2, lambda = 0.01,
+                       rho = list(along = 0, across = 0),
                        patch = switch(method, direct = 100, iterative = 300),
                        overlap = 20, ..., super.factor = 1)
 {
@@ -356,7 +436,9 @@ rip.deconv <- function(y, k, method = c("iterative", "direct"),
                   iterative = nonblind.hyperlap.iterative)
     nc <- nchannel(y)
     if (nc == 1) ## grayscale
-        rip.deconv.channel(y, k, FUN = FUN, ..., 
+        rip.deconv.channel(y, k, FUN = FUN,
+                           alpha = alpha, lambda = lambda, rho = rho,
+                           ..., 
                            patch = patch, overlap = overlap,
                            super.factor = super.factor, label = "[GRAY]")
     else if (nc != 3) stop("Input image 'y' must have exactly 1 or 3 channels")

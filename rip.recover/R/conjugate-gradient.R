@@ -162,7 +162,6 @@ iterative.irls <-
              x.start = NULL,
              yerror = c("normal", "huber", "bisquare", "poisson"),
              huber.k = 1.345, bisquare.c = 4.685, # must be > 1.548 but not checked
-             poisson.variance = FALSE,
              wt.thres = 0.01, niter.irls = 5, verbose = FALSE, label = "")
 {
     stopifnot(inherits(y, "rip"))
