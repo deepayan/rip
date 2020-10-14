@@ -9,7 +9,9 @@ export(rip.grad)
 
 ## utilities
 
-export(zapsmallp, optDFTlength, rip.edgetaper, make.kernel,
+## optDFTlength ?
+
+export(zapsmallp, rip.edgetaper, make.kernel,
        g.autoreg, g.nonpar,
        ## h.theoretical, # find better name if we want to export
        symmetric.blur)

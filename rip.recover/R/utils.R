@@ -45,14 +45,36 @@ rip.edgetaper <- function(x, sd = 5, boundary = 3 * sd, ...)
 }
 
 
-## Note: interpretation of bandwidth different from density()
-
+##' Constructs a two-dimensional blur kernel from a set of
+##' predetermined parametric family.
+##'
+##' The parametric families supported are the same ones as in
+##' \code{\link{density}}, but the interpretation of the bandwidth is
+##' different; it gives the distance from the origin outside which the
+##' kernel is 0, except for the Gaussian kernel where it is twice the
+##' variance parameter.
+##'
+##' The center pixel of the kernel spans the [-0.5, 0.5]^2 square, and
+##' other pixels are shifted accordingly. To compute the kernel value
+##' on a given pixel, the kernel function is evaluated on a roughly
+##' 10x10 grid within the pixel and then averaged. Bandwidth values
+##' less than 0.5 essentially produce degenerate kernels.
+##' 
+##' @title Construct a two-dimensional blur kernel
+##' @param h Numeric scalar giving bandwidth (in pixels).
+##' @param kern Character string giving parametric family.
+##' @param dim Integer scalar giving kernel dimension; must be 1 or 2.
+##' @param normalize Logical flag indicating whether the kernel should
+##'     be normalized to have total sum 1.
+##' @return A \code{"rip"} object giving the kernel, or, if \code{dim
+##'     = 1}, a vector.
 make.kernel <-
     function(h = 1,
              kern = c("epanechnikov","rectangular", "triangular",
                       "biweight", "gaussian", "cosine", "optcosine"),
-             ..., dim = 2)
+             dim = 2, normalize = TRUE)
 {
+    if (h <= 0) stop("Bandwidth 'h' must be positive")
     ## only limit to standard 'finite' kernels. For Gaussian, sd is taken to be h/2.
     ## consider adding cauchy (with parameter angle) to model out-of-focus blur.
     kern <- match.arg(kern)
@@ -68,12 +90,13 @@ make.kernel <-
                 biweight = ifelse(ax < h, 15/16 * (1 - (ax/h)^2)^2/h, 0),
                 cosine = ifelse(ax < h, (1 + cos(pi * x/h))/(2 * h), 0),
                 optcosine = ifelse(ax < h, pi/4 * cos(pi * x/(2 * h))/h, 0))
-    ## return(list(x = x, y = k))
+    if (!(dim %in% c(1, 2))) stop("Only 'dim=1' and 'dim=2' are allowed.")
     if (dim == 1)
     {
         f <- cut(x, seq(-klim, klim, by = 1), include.lowest = TRUE)
         kk <- return(tapply(k, f, mean))
-        kk[] <- kk / sum(kk)
+        if (normalize) kk[] <- kk / sum(kk)
+        kk
     }
     else if (dim == 2)
     {
@@ -83,14 +106,24 @@ make.kernel <-
         g <- expand.grid(f1 = f, f2 = f, KEEP.OUT.ATTRS=FALSE)
         g$k <- as.vector(outer(k, k))
         kk <- xtabs(k ~ f1 + f2, g) / xtabs( ~ f1 + f2, g) # mean
-        ## kk[] <- kk / sum(kk)
+        if (normalize) kk[] <- kk / sum(kk)
         as.rip(kk)
     }
-    else stop("Only 'dim=1' and 'dim=2' are allowed.")
 }
 
-## sort of like zapsmall, but doesn't round
-
+##' Set small values in a numeric vector to zero, similar to
+##' \code{\link{zapsmall}}, except that non-zero elements are retained
+##' as is instead of being rounded.
+##'
+##' @title Set small values to zero
+##' @param x A numeric vector, matrix, or array.
+##' @param digits Numeric giving "number" of decimal digits to retain
+##' @param prop Proportion (fraction) of maximum below which elements
+##'     are to be set to zero. Overrides \code{digits}.
+##' @param threshold Threshold absolute value below which elements are
+##'     to be set to zero. Overrides \code{prop}.
+##' @return Modified version of \code{x}, retaining attributes, with
+##'     small elements set to zero.
 zapsmallp <- function(x, digits = 2, prop = 10^(-digits), threshold = max(abs(x)) * prop)
 {
     x[abs(x) < threshold] <- 0

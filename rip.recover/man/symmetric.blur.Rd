@@ -74,3 +74,22 @@ symmetric.blur(y, kdim = round(dim(y)/3), resize = 1,
   the kernel is symmetric and that image gradients follow a Gaussian
   prior.
 }
+
+\examples{
+
+k <- sample.kernels[[3]]
+y <- rip.conv(sample.images[[4]], k, type = "valid") / 255
+image(y)
+
+k1 <- symmetric.blur(y, kdim = c(7, 7), g.method = "none", trim = FALSE)
+k2 <- symmetric.blur(y, kdim = c(7, 7), g.method = "autoreg", trim = FALSE)
+k3 <- symmetric.blur(y, kdim = c(7, 7), g.method = "autoreg", trim = FALSE,
+                     eta.sq = 0.01^2, corr.grad = FALSE)
+
+par(mfrow = c(2, 2))
+image(-k, main = "true kernel")
+image(-k1, main = "IID prior")
+image(-k2, main = "AR prior")
+image(-k3, main = "AR prior (eta = 0.01)")
+
+}
