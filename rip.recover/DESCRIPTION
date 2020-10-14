@@ -1,0 +1,17 @@
+Package: rip.recover
+Version: 0.1-1
+Date: 2020-10-10
+Type: Package
+Title: Image Reconstruction Utilities
+Authors@R: c(person("Deepayan", "Sarkar", role = c("aut", "cre"),
+	            email = "deepayan.sarkar@r-project.org",
+		    comment = c(ORCID = "0000-0003-4107-1553")),
+              person("Kaustav", "Nandy", role = "aut",
+	             email = "kaustav.ndyy@gmail.com"))
+Description: Tools for various image recovery problems such as
+	     deconvolution, denoising and super-resolution.
+LazyData: yes
+License: GPL-3
+Depends: rip.opencv
+Imports: grid, Matrix, parallel
+LinkingTo: Rcpp, RcppArmadillo

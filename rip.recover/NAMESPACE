@@ -1,0 +1,21 @@
+
+import(rip.opencv)
+import(Matrix)
+importFrom(parallel, parLapplyLB)
+
+export(rip.deconvlucy, rip.deconvwnr)
+export(rip.denoise, rip.deconv, rip.upscale)
+export(rip.grad)
+
+## utilities
+
+export(zapsmallp, optDFTlength, rip.edgetaper, make.kernel,
+       g.autoreg, g.nonpar,
+       ## h.theoretical, # find better name if we want to export
+       symmetric.blur)
+
+
+
+
+
+
