@@ -1,7 +1,8 @@
 
-import(rip.opencv)
+import(stats)
 import(Matrix)
-importFrom(parallel, parLapplyLB)
+import(rip.opencv)
+importFrom(parallel, parLapplyLB, clusterEvalQ)
 
 export(rip.deconvlucy, rip.deconvwnr)
 export(rip.denoise, rip.deconv, rip.upscale)

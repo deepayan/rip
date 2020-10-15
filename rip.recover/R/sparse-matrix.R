@@ -165,12 +165,12 @@ direct.irls <-
     {
         ## Careful: the attributes of xsplit are already set
         ## (corresponding to y), but results are possibly larger by
-        ## enlarge.factor. If x.start is specified, they must be split
+        ## super.factor. If x.start is specified, they must be split
         ## into accordingly larger pieces. (FIXME: check that this is
         ## always the right thing to do)
         xsplit[] <- splitImage(x.start,
-                               patch = enlarge.factor * patch,
-                               overlap = enlarge.factor * overlap)
+                               patch = super.factor * patch,
+                               overlap = super.factor * overlap)
     }
     ## Next do IRLS if (a) alpha != 2, or (b) yerror != "normal". 
     ## Process one sub-image (patch) at a time 

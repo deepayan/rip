@@ -11,7 +11,7 @@ Authors@R: c(person("Deepayan", "Sarkar", role = c("aut", "cre"),
 Description: Makes OpenCV routines available in R
 License: GPL-3
 SystemRequirements: OpenCV 3 or newer
-Imports: Rcpp (>= 0.11.0), RcppArmadillo (>= 0.4.000.2)
+Imports: Rcpp (>= 0.11.0), RcppArmadillo (>= 0.4.000.2), grDevices
 Depends: Rcpp (>= 0.11.0), RcppArmadillo (>= 0.4.000.2)
 LinkingTo: Rcpp, RcppArmadillo
 Suggests: knitr

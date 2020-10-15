@@ -11,6 +11,8 @@
 }
 \usage{
 rip.deconv(y, k, method = c("iterative", "direct"),
+           alpha = 2, lambda = 0.01,
+           rho = list(along = 0, across = 0),
            patch = switch(method, direct = 100, iterative = 300),
            overlap = 20, ..., super.factor = 1)
 
@@ -51,6 +53,20 @@ rip.denoise(y, ksigma = 1, kbw = ksigma, k = NULL,
     of the linear equations. Depending on the sparsity of \code{k}, this
     may require large amounts of memory. Missing values in \code{y} are
     only supported for the \code{"direct"} method.}
+  
+  \item{alpha}{The hyper-Laplacian parameter. \code{alpha = 2}
+    corresponds to Gaussian, and \code{alpha = 1} to double exponential
+    or Laplacian. \code{alpha = 0.8} is commonly used to model natural
+    images, and often referred to as a "sparse" prior because it puts
+    relatively more weight to 0 gradients.}
+
+  \item{lambda}{The regularization or tuning parameter.}
+
+  \item{rho}{List with components \code{along} and \code{across}
+    specifying local dependence of gradients as a 2-D auto-regressive
+    process in terms of correlation along and across the gradient
+    direction. \code{along = 0.3} and \code{across = 0.6} are good
+    values to try.}
 
   \item{patch}{Integer vector, replicated to be of length 2, giving the
     size of patches into which the input image is split to avoid
@@ -131,16 +147,20 @@ rip.denoise(y, ksigma = 1, kbw = ksigma, k = NULL,
 
   These are the main functions of this package, supporting single-image
   non-blind (known blur kernel) deconvolution and super-resolution using
-  a Bayesian regularization approach. As blurring and downsampling are
-  linear operations, the blurred image \code{y} can be expressed in
-  terms of the latent image \code{x} as \code{y = T x + error}, where
-  \code{T} is a sparse matrix determined by \code{k}. However, the
-  problem is generally under-constrained, so requires regularization to
-  solve. These funtions assume the following prior on \code{x}:
-  horizontal and vertical lag-1 gradients are independent, marginally
-  either mean-zero Gaussian or hyper-Laplacian (density proportional to
-  \code{exp(abs(x)^alpha)}), and possibly correlated according to a
-  simple 2-D lag-1 auto-regressive model.
+  a Bayesian regularization approach. \code{rip.upscale} and
+  \code{rip.denoise} are simple wrappers for \code{rip.deconv} with
+  additional ways to specify the blur kernel, and pass along additional
+  arguments to it.
+
+  As blurring and downsampling are linear operations, the blurred image
+  \code{y} can be expressed in terms of the latent image \code{x} as
+  \code{y = T x + error}, where \code{T} is a sparse matrix determined
+  by \code{k}. However, the problem is generally under-constrained, so
+  requires regularization to solve. These funtions assume the following
+  prior on \code{x}: horizontal and vertical lag-1 gradients are
+  independent, marginally either mean-zero Gaussian or hyper-Laplacian
+  (density proportional to \code{exp(abs(x)^alpha)}), and possibly
+  correlated according to a simple 2-D lag-1 auto-regressive model.
 
   The estimate of \code{x} is the posterior mode, equivalent to a
   generalized form of Ridge-type regularization in the Gaussian
@@ -167,5 +187,25 @@ rip.denoise(y, ksigma = 1, kbw = ksigma, k = NULL,
   gradient prior, is implemented in \code{\link{symmetric.blur}}, and
   used when \code{kbw < 1}. Kernels in parametric form can be generated
   using \code{\link{make.kernel}}.
+
+}
+
+
+\examples{
+
+k <- make.kernel(h = 3)
+y <- rip.conv(sample.images[[3]], k, type = "valid") / 255
+image(y)
+
+x1 <- rip.deconv(y, k, lambda = 0.001, patch = 100, method = "direct")
+x2 <- rip.denoise(y, kbw = 3, lambda = 0.001,
+                  patch = 300, method = "iterative")
+x3 <- rip.denoise(y, kbw = -1, lambda = 0.001)
+
+par(mfrow = c(2, 2))
+image(y)
+image(x1)
+image(x2)
+image(x3)
 
 }

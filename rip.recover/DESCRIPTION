@@ -13,5 +13,4 @@ Description: Tools for various image recovery problems such as
 LazyData: yes
 License: GPL-3
 Depends: rip.opencv
-Imports: grid, Matrix, parallel
-LinkingTo: Rcpp, RcppArmadillo
+Imports: Matrix, parallel

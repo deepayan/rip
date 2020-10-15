@@ -1,6 +1,11 @@
 useDynLib(rip.opencv)
 
-importFrom(Rcpp, evalCpp)
+importFrom(grDevices, as.raster)
+importFrom(graphics, image)
+importFrom(graphics, plot) # remove eventually
+
+## importFrom(Rcpp, evalCpp)
+importFrom(Rcpp, Module)
 
 export(rip.cv) # environment with Rcpp modules
 

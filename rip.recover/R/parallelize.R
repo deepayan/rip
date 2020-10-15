@@ -13,14 +13,13 @@ processPatch <-
              latent.dim = NULL,
              ...,
              cg.update,
-             poisson.variance = FALSE,
              wt.thres = 0.01, niter.irls = 5, verbose = FALSE, label = "")
 {
-    require(rip.opencv)
-    require(rip.recover)
-    iterative.gaussian <- rip.recover:::iterative.gaussian
-    stationary2iid <- rip.recover:::stationary2iid
-    conv2valid <- rip.recover:::conv2valid
+    ## require(rip.opencv)
+    ## require(rip.recover)
+    ## iterative.gaussian <- rip.recover:::iterative.gaussian
+    ## stationary2iid <- rip.recover:::stationary2iid
+    ## conv2valid <- rip.recover:::conv2valid
     ## if (verbose)
     ##     cat(sprintf("\r%s[A=%g, L=%g, SR=%d (%s)][ Least square estimate: ]           ",
     ##                 label, alpha, lambda, super.factor,
@@ -34,7 +33,7 @@ processPatch <-
                            latent.dim = latent.dim,
                            verbose = verbose)
     ## if (verbose) cat("\r                                                                                          \r")
-    if (alpha == 2 && !poisson.variance) return(x)
+    if (alpha == 2) return(x)
     for (i in seq_len(niter.irls))
     {
         ## if (verbose)
@@ -76,11 +75,10 @@ iterative.irls.parallel <-
              ...,
              cg.update = c("PR", "FR", "BS"),
              x.start = NULL,
-             poisson.variance = FALSE,
              wt.thres = 0.01, niter.irls = 5, verbose = FALSE, label = "")
 {
-    stopifnot(inherits(y, "rip"))
-    if (poisson.variance) stop("'poisson.variance = TRUE' not implemented yet.")
+    clusterEvalQ(cluster, require(rip.recover)) ## setup
+    y <- as.rip(y)
     if (nchannel(y) != 1) stop("Multi-channel images not supported yet.")
     cg.update <- match.arg(cg.update)
     ysplit <- splitImage(y, patch = patch, overlap = overlap)
@@ -94,7 +92,6 @@ iterative.irls.parallel <-
                     latent.dim = latent.dim,
                     cg.update = cg.update,
                     ...,
-                    poisson.variance = poisson.variance,
                     wt.thres = wt.thres, niter.irls = niter.irls,
                     verbose = verbose, label = label)
     if (verbose) cat("\r                                                                                          \r")

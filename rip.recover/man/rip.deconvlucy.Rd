@@ -49,17 +49,10 @@ rip.deconvlucy(y, k, niter = 10, x.init = NULL, keep.intermediate = FALSE)
 
 \examples{
 
-k <- make.kernel(h = 3)
+k <- sample.kernels[[2]]
 y <- rip.conv(sample.images[[3]], k, type = "valid") / 255
-
-x1 <- rip.deconv(y, k, verbose = TRUE, patch = 100, method = "direct")
-x2 <- rip.deconv(y, kbw = 3, verbose = TRUE, patch = 300, method = "iterative")
-x3 <- rip.denoise(y, kbw = -1, lambda = 0.001, verbose = TRUE, patch = 300)
-
-par(mfrow = c(2, 2))
 image(y)
-image(x1)
-image(x2)
-image(x3)
+x <- rip.deconvlucy(y, k, niter = 100)
+image(x)
 
 }

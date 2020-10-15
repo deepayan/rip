@@ -52,8 +52,8 @@ rip.deconvlucy <-
     for (i in seq_len(niter))
     {
         ## FIXME: check if valid / full convolution would be more correct
-        r <- y / rip.filter(x, k)
-        x[] <- x * rip.filter(r, .k)
+        r <- y / rip.filter(x, .k)
+        x[] <- x * rip.filter(r, k)
         if (keep.intermediate) h[[i]] <- x
     }
     if (keep.intermediate) attr(x, "history") <- h
@@ -257,11 +257,15 @@ rip.deconv.channel <- function(y, k, FUN, alpha, lambda, rho,
 ##'
 ##' These are the main functions of this package, supporting
 ##' single-image non-blind (known blur kernel) deconvolution and
-##' super-resolution using a Bayesian regularization approach. As
-##' blurring and downsampling are linear operations, the blurred image
-##' \code{y} can be expressed in terms of the latent image \code{x} as
-##' \code{y = T x + error}, where \code{T} is a sparse matrix
-##' determined by \code{k}. However, the problem is generally
+##' super-resolution using a Bayesian regularization
+##' approach. \code{rip.upscale} and \code{rip.denoise} are simple
+##' wrappers for \code{rip.deconv} with additional ways to specify the
+##' blur kernel, and pass along additional arguments to it.
+##'
+##' As blurring and downsampling are linear operations, the blurred
+##' image \code{y} can be expressed in terms of the latent image
+##' \code{x} as \code{y = T x + error}, where \code{T} is a sparse
+##' matrix determined by \code{k}. However, the problem is generally
 ##' under-constrained, so requires regularization to solve. These
 ##' funtions assume the following prior on \code{x}: horizontal and
 ##' vertical lag-1 gradients are independent, marginally either
@@ -472,10 +476,10 @@ rip.upscale <-
 {
     method <- match.arg(method)
     if (is.null(k)) 
-        k <- if (ksigma < 0) symmetric.blur(y, kdim = pmin(round(dim(y) / 3), overlap),
-                                            resize = factor)
-             else if (ksigma == 0) as.rip(matrix(1,factor,factor))
-             else make.kernel(h = factor * ksigma, kern = "epanechnikov")
+        k <- if (kbw < 0) symmetric.blur(y, kdim = pmin(round(dim(y) / 3), overlap),
+                                         resize = factor)
+             else if (kbw == 0) as.rip(matrix(1,factor,factor))
+             else make.kernel(h = factor * kbw, kern = "epanechnikov")
     k[] <- k / sum(k)
     ## str(k)
     rip.deconv(y, k, method = method, patch = patch, overlap = overlap,
@@ -493,9 +497,9 @@ rip.denoise <-
 {
     method <- match.arg(method)
     if (is.null(k)) 
-        k <- if (ksigma < 0) symmetric.blur(y, kdim = pmin(round(dim(y) / 3), overlap))
-             else if (ksigma == 0) as.rip(matrix(1,1,1))
-             else make.kernel(h = ksigma, kern = "epanechnikov")
+        k <- if (kbw < 0) symmetric.blur(y, kdim = pmin(round(dim(y) / 3), overlap))
+             else if (kbw == 0) as.rip(matrix(1,1,1))
+             else make.kernel(h = kbw, kern = "epanechnikov")
     k[] <- k / sum(k)
     ## str(dim(k))
     rip.deconv(y, k, method = method, patch = patch, overlap = overlap, ...)
