@@ -12,5 +12,5 @@ Description: Tools for various image recovery problems such as
 	     deconvolution, denoising and super-resolution.
 LazyData: yes
 License: GPL-3
-Depends: rip.opencv
+Depends: rip.opencv, R (>= 3.0)
 Imports: Matrix, parallel

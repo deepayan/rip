@@ -53,6 +53,7 @@ rip.deconvlucy <-
     {
         ## FIXME: check if valid / full convolution would be more correct
         r <- y / rip.filter(x, .k)
+        r[!is.finite(r)] <- 0 # FIXME: is this the right thing to do?
         x[] <- x * rip.filter(r, k)
         if (keep.intermediate) h[[i]] <- x
     }
@@ -452,7 +453,9 @@ rip.deconv <- function(y, k, method = c("iterative", "direct"),
         rgb.array <- as.array(y)
         for (i in 1:nc)
             rgb.layers[[i]] <-
-                rip.deconv.channel(as.rip(rgb.array[,,i]), k, FUN = FUN, ..., 
+                rip.deconv.channel(as.rip(rgb.array[,,i]), k, FUN = FUN,
+                                   alpha = alpha, lambda = lambda, rho = rho,
+                                   ..., 
                                    patch = patch, overlap = overlap,
                                    super.factor = super.factor,
                                    label = c("[Rgb]", "[rGb]", "[rgB]")[i])

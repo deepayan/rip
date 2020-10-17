@@ -31,6 +31,7 @@ export(nchannel)
 export(as.rip)
 
 S3method(as.rip, default)
+S3method(as.rip, rip)
 S3method(as.rip, matrix)
 S3method(as.rip, array)
 S3method(as.rip, raster)
