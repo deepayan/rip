@@ -103,8 +103,9 @@ symmetric.blur <-function(y, kdim = round(dim(y) / 3), resize = 1,
     symk.hat <- 0.5 * (symk(Yh, W = Wh, H = Hh, kdim = kdim) +
                        symk(Yv, W = Wv, H = Hv, kdim = kdim))
     if (resize != 1) symk.hat <- rip.resize(symk.hat, fx = resize)
-    if (trim) ktrim0odd(zapsmallp(symk.hat, digits = zap.digits))
-    else symk.hat
+    if (trim) symk.hat <- ktrim0odd(zapsmallp(symk.hat, digits = zap.digits))
+    symk.hat[] <- symk.hat / sum(symk.hat)
+    symk.hat
 }
 
 

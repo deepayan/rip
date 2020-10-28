@@ -175,7 +175,7 @@ nonblind.hyperlap.iterative <-
     function(y, k, alpha, lambda, rho,
              patch, overlap,
              cache.dir = getOption("rip.cache.dir"),
-             decorrelate = c("image", "frequency"),
+             decorrelate = c("frequency", "image"),  # frequency is slower but does not cause shifts
              cluster = NULL,
              ...,
              super.factor = 1)
