@@ -15,3 +15,19 @@ introduction is available
 [here](https://deepayan.github.io/rip/recover-intro.html).
 
 
+## Installation
+
+These packages are not available on CRAN yet, but can be installed
+from Github. Installation of `rip.opencv` requires OpenCV development
+libraries, and you will need a working toolchain to compile from
+source. This should work seamlessly on most platforms, or at least
+give hints on how to proceed. For example:
+
+```
+library(remotes) # install first if necessary
+remotes::install_github("deepayan/rip/rip.opencv")
+remotes::install_github("deepayan/rip/rip.recover")
+```
+
+
+
