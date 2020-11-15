@@ -83,7 +83,22 @@ enlargeSplitSizes <- function(s, factor = 1)
 }
 
 
-unsplitImage <- function(xsplit, enlarge.factor = 1)
+adjustSplitSizesFull <- function(s, h = c(0, 0))
+{
+    ## s$row and s$col define split. They need to be adjusted so that
+    ## all the starts are decreased by h and all the ends are
+    ## increased by h. To make sure we start at 1, finally shift
+    ## everything forward by h. Effectively, this means (1) leave
+    ## starts alone, and (2) increase ends by 2*h.
+    within(s,
+    {
+        row$ends <- row$ends + 2 * h[1]
+        col$ends <- col$ends + 2 * h[2]
+    })
+}
+
+
+unsplitImage <- function(xsplit, enlarge.factor = 1, full = FALSE)
 {
     ## For deconvolution problems, xsplit[[i]] are slightly larger
     ## than corresponding ysplit[[i]] (due to inclusion of
@@ -101,30 +116,39 @@ unsplitImage <- function(xsplit, enlarge.factor = 1)
     s <- attr(xsplit, "split")
     if (is.null(s)) stop("Information about split is missing.")
     if (!missing(enlarge.factor)) s <- enlargeSplitSizes(s, enlarge.factor)
-    srow <- s$row
-    scol <- s$col
     ## latent and output (to be retained) dimensions of each
     ## patch. Although we do not check, these should be same for all
     ## patches.
     latent.dim <- dim(xsplit[[1]])
-    output.dim <- c(srow$ends[1], scol$ends[1])
+    output.dim <- c(s$row$ends[1], s$col$ends[1])
     ## number of rows / columns to remove on each side
     h <- (latent.dim - output.dim) / 2
     stopifnot(all(h == round(h)))
+    ## By convention, we usually want the same size as input, but
+    ## sometimes it is useful to do further work with the "full"
+    ## latent image.
+    if (full) s <- adjustSplitSizesFull(s, h = h)
+    ## str(list(s = s, h = h))
+    srow <- s$row
+    scol <- s$col
     x <- matrix(NA_real_, max(srow$ends), max(scol$ends))
     for (i in seq_along(srow$starts))
         for (j in seq_along(scol$starts))
         {
             xpart <- xsplit[[i, j]]
-            xdim <- dim(xpart) # need to trim borders to remove h rows/columns on all sides
-            xpart <- xpart[seq(h[1] + 1, xdim[1] - h[1]),
-                           seq(h[2] + 1, xdim[2] - h[2])]
+            if (!full)
+            {
+                ## need to trim borders to remove h rows/columns on all sides
+                xdim <- dim(xpart) 
+                xpart <- xpart[seq(h[1] + 1, xdim[1] - h[1]),
+                               seq(h[2] + 1, xdim[2] - h[2])]
+            }
             ## image(as.rip(xpart), main = sprintf("%d, %d", i, j))
             rrange <- srow$starts[i]:srow$ends[i]
             crange <- scol$starts[j]:scol$ends[j]
             rpart <- 1:nrow(xpart)
             cpart <- 1:ncol(xpart)
-            ## ## crude weighting: remove half of overlap with previous segment
+            ## crude weighting: remove half of overlap with previous segment
             if (i > 1)
             {
                 orow <- srow$ends[i-1] - srow$starts[i] + 1

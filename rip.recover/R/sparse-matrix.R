@@ -114,6 +114,7 @@ direct.irls <-
              patch = round(100 / super.factor),
              overlap = round(20 / super.factor),
              latent.dim = NULL,
+             full.latent = FALSE,
              ...,
              x.start = NULL,
              yerror = c("normal", "huber", "bisquare", "poisson"),
@@ -126,6 +127,7 @@ direct.irls <-
         stop("Multi-channel images not supported; call each channel separately.")
     ysplit <- splitImage(y, patch = patch, overlap = overlap)
     xsplit <- ysplit # placeholder
+###    Ssplit <- ysplit # placeholder for approximate posterior variance
     if (alpha == 2 && !is.null(x.start))
         stop("Unexpected input: x.start specified with alpha=2")
     ## First solve unweighted L2 problem, unless x.start is already specified
@@ -156,10 +158,14 @@ direct.irls <-
                                     ...,
                                     latent.dim = latent.dim,
                                     verbose = verbose)
+###            Ssplit[[j]] <- xsplit[[j]]
+###            Ssplit[[j]][] <- 1 / as.vector(diag(A))
         }
         if (verbose) cat("\r                                                                                         \r")
         if (alpha == 2 && yerror == "normal")
-            return(unsplitImage(xsplit, enlarge.factor = super.factor))
+            return(unsplitImage(xsplit, enlarge.factor = super.factor, full = full.latent))
+###            return(structure(unsplitImage(xsplit, enlarge.factor = super.factor, full = full.latent),
+###                             pvar = unsplitImage(Ssplit, enlarge.factor = super.factor, full = full.latent)))
     }
     else
     {
@@ -254,8 +260,12 @@ direct.irls <-
                 }
         }
         xsplit[[j]][] <- xx
+###        if (i == niter.irls)
+###            Ssplit[[j]][] <- 1 / as.vector(diag(A)) # FIXME: wrong if any NAs present
     }
     if (verbose) cat("\r                                                                                         \r")
-    unsplitImage(xsplit, enlarge.factor = super.factor)
+    ## structure(unsplitImage(xsplit, enlarge.factor = super.factor, full = full.latent),
+    ##           pvar = unsplitImage(Ssplit, enlarge.factor = super.factor, full = full.latent))
+    unsplitImage(xsplit, enlarge.factor = super.factor, full = full.latent)
 }
 

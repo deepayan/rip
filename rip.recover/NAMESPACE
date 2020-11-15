@@ -15,7 +15,8 @@ export(rip.grad)
 export(zapsmallp, rip.edgetaper, make.kernel, addPoissonNoise,
        g.autoreg, g.nonpar,
        ## h.theoretical, # find better name if we want to export
-       symmetric.blur)
+       symmetric.blur,
+       posterior.variance) # export? maybe not
 
 
 

@@ -243,8 +243,6 @@ rip.deconv.channel <- function(y, k, FUN, alpha, lambda, rho,
         lambda = lambda, rho = rho,
         patch = patch, overlap = overlap,
         ..., super.factor = super.factor)
-
-    
 }
 
 ## NOTE: patch decreased to maximum of image size if larger
@@ -421,11 +419,11 @@ rip.deconv <- function(y, k, method = c("iterative", "direct"),
                        alpha = 2, lambda = 0.01,
                        rho = list(along = 0, across = 0),
                        patch = switch(method, direct = 100, iterative = 300),
-                       overlap = 20, ..., super.factor = 1)
+                       overlap = 20, ..., super.factor = 1, trim.k = FALSE)
 {
     stopifnot(inherits(y, "rip"))
     method <- match.arg(method)
-    k <- ktrim0odd(k)
+    if (trim.k) k <- ktrim0odd(k)
     if (any(dim(k) %% 2 == 0)) stop("kernel must have odd dimensions")
     patch <- pmin(patch, dim(y)) # patch size should not exceed size of y
     ## FIXME: TODO adjust overlap so that it is as uniform as possible

@@ -157,6 +157,7 @@ iterative.irls <-
              patch = round(100 / super.factor),
              overlap = round(20 / super.factor),
              latent.dim = NULL,
+             full.latent = FALSE,
              ...,
              cg.update = c("PR", "FR", "BS"),
              x.start = NULL,
@@ -194,7 +195,7 @@ iterative.irls <-
         }
         if (verbose) cat("\r                                                                                          \r")
         if (alpha == 2 && yerror == "normal")
-            return(unsplitImage(xsplit, enlarge.factor = super.factor))
+            return(unsplitImage(xsplit, enlarge.factor = super.factor, full = full.latent))
     }
     else
     {
@@ -274,7 +275,7 @@ iterative.irls <-
         xsplit[[j]] <- xx
     }
     if (verbose) cat("\r                                                                                          \r")
-    unsplitImage(xsplit, enlarge.factor = super.factor)
+    unsplitImage(xsplit, enlarge.factor = super.factor, full = full.latent)
 }
 
 
