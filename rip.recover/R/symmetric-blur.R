@@ -67,6 +67,9 @@ symmetric.blur <-function(y, kdim = round(dim(y) / 3), resize = 1,
                           edgetaper = FALSE)
 {
     y <- rip.desaturate(y) # in case y is a color image
+    ## even size leads to ambiguity in center pixel, so avoid
+    if (nrow(y) %% 2 == 0) y <- as.rip(y[-1, ])
+    if (ncol(y) %% 2 == 0) y <- as.rip(y[, -1])
     g.method <- match.arg(g.method)
     ## g can be provided as list(h = ..., v = ...)
     if (is.null(g))
@@ -90,8 +93,9 @@ symmetric.blur <-function(y, kdim = round(dim(y) / 3), resize = 1,
         M <- sqrt(pmax(Y^2 - eta.sq * H, 0) / W)
         ##   sqrt(pmax((Y^2/W) - eta.sq * H, 0)) # old - wrong ~ eta=0
         k2 <- rip.shift(pmax(rip.ndft(M + 0i, inverse = TRUE), 0))
-        rlim <- seq(-kdim[1], kdim[1]) + round(nrow(k2) / 2)
-        clim <- seq(-kdim[2], kdim[2]) + round(ncol(k2) / 2)
+        cpos <- (dim(k2) + 1) / 2 # guaranteed to be integer, see above
+        rlim <- seq(-kdim[1], kdim[1]) + cpos[1]
+        clim <- seq(-kdim[2], kdim[2]) + cpos[2]
         as.rip(k2[rlim, clim])
     }
     if (corr.grad)
