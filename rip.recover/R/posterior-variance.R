@@ -5,7 +5,7 @@ posterior.variance <-
              rho = list(along = 0, across = 0),
              yerror = c("normal", "huber", "bisquare", "poisson"),
              huber.k = 1.345, bisquare.c = 4.685, # must be > 1.548 but not checked
-             wt.thres = 0.01)
+             wt.thres = 0.01, ...)
 {
     ## For now, don't split, but splitting won't be difficult if needed
     yerror <- match.arg(yerror)

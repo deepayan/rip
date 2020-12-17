@@ -64,9 +64,12 @@ symmetric.blur <-function(y, kdim = round(dim(y) / 3), resize = 1,
                           corr.grad = TRUE,
                           np.span = 2/3,
                           trim = TRUE, zap.digits = 1.5,
+                          resize.mode = c("image", "kernel"),
                           edgetaper = FALSE)
 {
+    resize.mode <- match.arg(resize.mode)
     y <- rip.desaturate(y) # in case y is a color image
+    if (resize != 1 && resize.mode == "image") y <- rip.resize(y, fx = resize, method = "linear")
     ## even size leads to ambiguity in center pixel, so avoid
     if (nrow(y) %% 2 == 0) y <- as.rip(y[-1, ])
     if (ncol(y) %% 2 == 0) y <- as.rip(y[, -1])
@@ -106,7 +109,7 @@ symmetric.blur <-function(y, kdim = round(dim(y) / 3), resize = 1,
     else Hh <- Hv <- 1
     symk.hat <- 0.5 * (symk(Yh, W = Wh, H = Hh, kdim = kdim) +
                        symk(Yv, W = Wv, H = Hv, kdim = kdim))
-    if (resize != 1) symk.hat <- rip.resize(symk.hat, fx = resize)
+    if (resize != 1 && resize.mode == "kernel") symk.hat <- rip.resize(symk.hat, fx = resize)
     if (trim) symk.hat <- ktrim0odd(zapsmallp(symk.hat, digits = zap.digits))
     symk.hat[] <- symk.hat / sum(symk.hat)
     symk.hat
