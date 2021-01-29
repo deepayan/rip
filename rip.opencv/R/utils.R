@@ -130,6 +130,7 @@ rip.blur <-
     method <- match.arg(method)
     ksize <- rep(ksize, length.out = 2)
     anchor <- rep(anchor, length.out = 2)
+    bcode <- border2enum(match.arg(borderType))
     switch(method,
            mean =
                {
