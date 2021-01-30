@@ -78,8 +78,6 @@ cv_edgePreservingFilter(Rcpp::NumericMatrix imgMat, int flags,
 }
 
 
-
-
 RCPP_MODULE(photo)
 {
     function("fastNlMeansDenoising", &cv_fastNlMeansDenoising,
