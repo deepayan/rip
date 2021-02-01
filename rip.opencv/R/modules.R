@@ -4,7 +4,7 @@ rip.cv <- new.env(parent = emptyenv())
 .initModules <- function()
 {
     for (m in c("IO", "core", "transforms", "filter", "feature",
-                "photo", "imgproc"))
+                "photo", "imgproc", "xphoto"))
     {
         rip.cv[[m]] <- Module(m, PACKAGE = "rip.opencv")
     }

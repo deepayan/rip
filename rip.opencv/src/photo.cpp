@@ -4,8 +4,8 @@ using namespace cv;
 using namespace Rcpp;
 
 Rcpp::NumericMatrix
-cv_fastNlMeansDenoising(Rcpp::NumericMatrix imgMat, float h, 
-			int templateWindowSize, int searchWindowSize)
+cv_fastNlMeansDenoising(Rcpp::NumericMatrix imgMat, float h = 3.0, 
+			int templateWindowSize = 7, int searchWindowSize = 21)
 {
     cv::Mat outImg, M = RCPP2CV(imgMat, 0);
     cv::fastNlMeansDenoising(M, outImg, h, templateWindowSize, searchWindowSize);
@@ -78,11 +78,18 @@ cv_edgePreservingFilter(Rcpp::NumericMatrix imgMat, int flags,
 }
 
 
+
 RCPP_MODULE(photo)
 {
     function("fastNlMeansDenoising", &cv_fastNlMeansDenoising,
+	     List::create(_["x"], _["h"] = 3.0,
+			  _["templateWindowSize"] = 7,
+			  _["searchWindowSize"] = 21),
 	     "NL means denoising.");
     function("fastNlMeansDenoisingColored", &cv_fastNlMeansDenoisingColored,
+	     List::create(_["x"], _["h"] = 3.0,
+			  _["templateWindowSize"] = 7,
+			  _["searchWindowSize"] = 21),
 	     "NL means denoising (colored).");
     function("inpaint", &cv_inpaint,
 	     List::create(_["x"], _["mask"],
