@@ -1,10 +1,17 @@
 ### File import and export
 
-##' .. content for \description{} (no empty lines) ..
+##' Import image data from an external file or write image data to an
+##' external file.
 ##'
-##' .. content for \details{} ..
-##' @title Read data from an image file
-##' @param file path of the image file
+##' User-friendly interface to the OpenCV \code{cv::imread} and
+##' \code{cv::imwrite} functions via the \code{rip.cv$IO} module. The
+##' file format is automatically determined by OpenCV.
+##' 
+##' @title Import from or export to an image file
+##' @param file Path of the image file.
+##' @param x An object of class \code{"rip"} containing data that can
+##'     be interpreted as an image by OpenCV (usually with 1, 3, or 4
+##'     channels with values between 0 and 255).
 ##' @param type Character string that determines whether the imported
 ##'     data will be stored as grayscale (default) or color (including
 ##'     possibly an alpha channel). If \code{"original"}, the choice
@@ -21,14 +28,6 @@ rip.import <- function(file, type = c("grayscale", "color", "original"))
     rip.cv$IO$imread(file, itype)
 }
 
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
-##' @title Writing an image
-##' @param outFile output file name.
-##' @param img rip object of 1 or 3 channels
-##' @return 
-##' @author Kaustav Nandy
 rip.export <- function(x, file = "")
 {
     rip.cv$IO$imwrite(x, file)
@@ -254,7 +253,7 @@ rip.conv <- function(x, k, type = c("full", "valid", "same"), flip = TRUE)
 ##'
 ##' .. content for \details{} ..
 ##' @title 
-##' @param x 'rip' object to transform
+##' @param x \code{"rip"} object to transform
 ##'
 ##' @param inverse Logical flag. If \code{TRUE}, inverse DFT is
 ##'     computed, assuming real output.
@@ -319,8 +318,16 @@ rip.ndft <- function(x, pad = NULL, inverse = FALSE)
 }
 
 
-
-
+rip.dct <- function(x, pad = NULL, inverse = FALSE, rowwise = FALSE)
+{
+    x <- as.rip(x)
+    if (!is.null(pad)) x <- rip.pad(x, pad = pad, value = 0, borderType = "constant")
+    eflags <- rip.cv$enums$DftFlags
+    flags <- 0L
+    if (inverse) flags <- bitwOr(flags, eflags["DCT_INVERSE"])
+    if (rowwise) flags <- bitwOr(flags, eflags["DCT_ROWS"])
+    rip.cv$transforms$dct(x, flags)
+}
 
 
 ## Color to grayscale

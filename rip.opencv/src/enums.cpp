@@ -20,7 +20,9 @@ Rcpp::IntegerVector cv_enum_BorderTypes()
 Rcpp::IntegerVector cv_enum_DftFlags()
 {
     IntegerVector
-	e = IntegerVector::create(_["DFT_INVERSE"] = (int) DFT_INVERSE,
+	e = IntegerVector::create(_["DCT_INVERSE"] = (int) DCT_INVERSE,
+				  _["DCT_ROWS"] = (int) DCT_ROWS,
+				  _["DFT_INVERSE"] = (int) DFT_INVERSE,
 				  _["DFT_SCALE"] = (int) DFT_SCALE,
 				  _["DFT_ROWS"] = (int) DFT_ROWS,
 				  _["DFT_COMPLEX_OUTPUT"] = (int) DFT_COMPLEX_OUTPUT,

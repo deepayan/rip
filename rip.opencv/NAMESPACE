@@ -19,7 +19,8 @@ export(rip.import,     # IO $ imread
        rip.blur,       # filter $ medianBlur | GaussianBlur | blur
        rip.flip,       # core $ flip
        rip.filter,     # filter $ filter2D
-       rip.dft )       # transforms $ dft
+       rip.dft,        # transforms $ dft
+       rip.dct )       # transforms $ dct
 
 ## utilities
 

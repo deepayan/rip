@@ -19,6 +19,15 @@ cv_xphoto_inpaint(Rcpp::NumericMatrix imgMat, Rcpp::NumericMatrix maskMat,
 }
 
 
+// bm3dDenoising() is not available unless OPENCV_ENABLE_NONFREE is
+// set when building OpenCV. This is usually not the case in binary
+// distributions such as Debian.
+
+// Fortunately, this only gives a run-time error, not give a
+// compile-time error, so not bothering to figure out whether it is
+// available or not.
+
+
 Rcpp::NumericMatrix
 cv_xphoto_bm3dDenoising(Rcpp::NumericMatrix imgMat)
 {
@@ -108,7 +117,7 @@ RCPP_MODULE(xphoto)
 	     "Impute missing pixels (xphoto).");
     function("bm3dDenoising", &cv_xphoto_bm3dDenoising,
 	     List::create(_["x"]),
-	     "BM3D Denoising (xphoto).");
+	     "BM3D Denoising (xphoto). May not be available unless built with OPENCV_ENABLE_NONFREE enabled");
     function("dctDenoising", &cv_xphoto_dctDenoising,
 	     List::create(_["x"], _["sigma"] = 1.0, _["psize"] = 16),
 	     "DCT Denoising (xphoto).");

@@ -1,7 +1,5 @@
 #include "common.h"
 
-// FIXME: add dct and idct ?
-
 using namespace Rcpp;
 
 int cv_getOptimalDFTSize(int vecSize)
@@ -19,18 +17,43 @@ Rcpp::NumericMatrix cv_dft(Rcpp::NumericMatrix x, int flags = 0, int nonzerorows
     //              32 = DFT_REAL_OUTPUT (for inverse, assumes symmetry, produced real)
     // nonzerorows: only first nonzerorows have non-zero data (output
     //              when inverting)
-    cv::Mat out, f, M = RCPP2CV(x, 5);
-    M.convertTo(f, CV_32F);
-    cv::dft(f, out, flags, nonzerorows);
+    cv::Mat out, M = RCPP2CV(x, 5);
+    cv::dft(M, out, flags, nonzerorows);
     return CV2RCPP(out);
 }
 
-Rcpp::NumericMatrix cv_idft(Rcpp::NumericMatrix imgMat, int flags, int nonzerorows)
+Rcpp::NumericMatrix cv_idft(Rcpp::NumericMatrix x, int flags, int nonzerorows)
 {
-    cv::Mat out, f, M = RCPP2CV(imgMat, 5);
-    M.convertTo(f, CV_32F);
-    idft(f, out, flags);
-    return (CV2RCPP(out));
+    cv::Mat out, M = RCPP2CV(x, 5);
+    cv::idft(M, out, flags);
+    return CV2RCPP(out);
+}
+
+Rcpp::NumericMatrix cv_dct(Rcpp::NumericMatrix x, int flags = 0)
+{
+    // flags: OR of 
+    //
+    // DCT_INVERSE (performs an inverse 1D or 2D transform instead of
+    //              the default forward transform.)
+    // 
+    // DCT_ROWS (performs a forward or inverse transform of every
+    //           individual row of the input matrix. This flag enables
+    //           you to transform multiple vectors simultaneously and
+    //           can be used to decrease the overhead (which is
+    //           sometimes several times larger than the processing
+    //           itself) to perform 3D and higher-dimensional
+    //           transforms and so forth.
+    
+    cv::Mat out, M = RCPP2CV(x, 5);
+    cv::dct(M, out, flags);
+    return CV2RCPP(out);
+}
+
+Rcpp::NumericMatrix cv_idct(Rcpp::NumericMatrix x, int flags)
+{
+    cv::Mat out, M = RCPP2CV(x, 5);
+    cv::idct(M, out, flags);
+    return CV2RCPP(out);
 }
 
 // useful mostly when using DFT_REAL_OUTPUT in dft()
@@ -48,8 +71,10 @@ Rcpp::NumericMatrix cv_mulSpectrums(Rcpp::NumericMatrix x1,
 
 RCPP_MODULE(transforms) 
 {
-    function("dft", &cv_dft, "Discrete Fourier Transformation");
+    function("dft", &cv_dft, "Discrete Fourier Transformation (DFT)");
     function("idft", &cv_idft, "Inverse DFT");
+    function("dct", &cv_dct, "Discrete Cosine Transformation (DCT)");
+    function("idct", &cv_idct, "Inverse DCT");
     function("mulSpectrums", &cv_mulSpectrums, "Multiply DFT Spectrums");
     function("getOptimalDFTSize", &cv_getOptimalDFTSize, "get optimal DFT size for Fourier Transformation");
 }
