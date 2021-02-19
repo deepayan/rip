@@ -152,16 +152,20 @@ unsplitImage <- function(xsplit, enlarge.factor = 1, full = FALSE)
             if (i > 1)
             {
                 orow <- srow$ends[i-1] - srow$starts[i] + 1
-                skiprow <- round(orow / 2)
-                rrange <- tail(rrange, -skiprow)
-                rpart <- tail(rpart, -skiprow)
+                if (orow > 1) {
+                    skiprow <- round(orow / 2)
+                    rrange <- tail(rrange, -skiprow)
+                    rpart <- tail(rpart, -skiprow)
+                }
             }
             if (j > 1)
             {
                 ocol <- scol$ends[j-1] - scol$starts[j] + 1
-                skipcol <- round(ocol / 2)
-                crange <- tail(crange, -skipcol)
-                cpart <- tail(cpart, -skipcol)
+                if (ocol > 1) {
+                    skipcol <- round(ocol / 2)
+                    crange <- tail(crange, -skipcol)
+                    cpart <- tail(cpart, -skipcol)
+                }
             }
             x[rrange, crange] <- as.matrix(xpart[rpart, cpart])
         }
