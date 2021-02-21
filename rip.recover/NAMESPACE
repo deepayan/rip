@@ -8,6 +8,7 @@ export(rip.deconvlucy, rip.deconvwnr)
 export(rip.denoise, rip.deconv, rip.upscale)
 export(rip.grad)
 export(rip.ssim)
+export(rip.split, rip.unsplit)
 
 ## utilities
 
