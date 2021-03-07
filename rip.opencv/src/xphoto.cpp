@@ -29,10 +29,14 @@ cv_xphoto_inpaint(Rcpp::NumericMatrix imgMat, Rcpp::NumericMatrix maskMat,
 
 
 Rcpp::NumericMatrix
-cv_xphoto_bm3dDenoising(Rcpp::NumericMatrix imgMat)
+cv_xphoto_bm3dDenoising(Rcpp::NumericMatrix imgMat,
+			double h,
+			int templateWindowSize,
+			int searchWindowSize)
 {
     cv::Mat outImg, M = RCPP2CV(imgMat, 0);
-    cv::xphoto::bm3dDenoising(M, outImg);
+    cv::xphoto::bm3dDenoising(M, outImg, (float) h,
+			      templateWindowSize, searchWindowSize);
  			       // float    h = 1,
 			       // int    templateWindowSize = 4,
 			       // int    searchWindowSize = 16,
@@ -106,7 +110,6 @@ void cv::xphoto::oilPainting(InputArray 	src,
 			     )	
 
 */
-    
 
 
 RCPP_MODULE(xphoto)
@@ -116,7 +119,9 @@ RCPP_MODULE(xphoto)
 			  _["algorithmType"] = 0),
 	     "Impute missing pixels (xphoto).");
     function("bm3dDenoising", &cv_xphoto_bm3dDenoising,
-	     List::create(_["x"]),
+	     List::create(_["x"], _["h"] = 1.0,
+			  _["templateWindowSize"] = 4,
+			  _["searchWindowSize"] = 16),
 	     "BM3D Denoising (xphoto). May not be available unless built with OPENCV_ENABLE_NONFREE enabled");
     function("dctDenoising", &cv_xphoto_dctDenoising,
 	     List::create(_["x"], _["sigma"] = 1.0, _["psize"] = 16),
