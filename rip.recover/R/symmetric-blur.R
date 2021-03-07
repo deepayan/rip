@@ -63,7 +63,7 @@ symmetric.blur <-function(y, kdim = round(dim(y) / 3), resize = 1,
                           eta.sq = 0.005^2,
                           corr.grad = TRUE,
                           np.span = 2/3,
-                          trim = TRUE, zap.digits = 1.5, use.AIC = FALSE,
+                          trim = TRUE, zap.digits = 1.5, show.msc = FALSE,
                           resize.mode = c("image", "kernel"),
                           edgetaper = FALSE)
 {
@@ -111,11 +111,11 @@ symmetric.blur <-function(y, kdim = round(dim(y) / 3), resize = 1,
     else Hh <- Hv <- 1
     symk.hat <- 0.5 * (symk(Yh, W = Wh, H = Hh, kdim = kdim) +
                        symk(Yv, W = Wv, H = Hv, kdim = kdim))
-    ## Can we trim in a more sophisticated way by using AIC? The idea
-    ## is that we try different values of kdim and zap.digits (in
+    ## Can we trim in a more sophisticated way by using AIC / BIC? The
+    ## idea is that we try different values of kdim and zap.digits (in
     ## terms of percentage of maximum below which we set to 0), and
-    ## choose the best one by AIC. This is also ultimately ad hoc,
-    ## because the 'trimmed' k is not the actual constrained MLE.
+    ## choose the best one. This is also ultimately ad hoc, because
+    ## the 'cropped / trimmed' k is not the actual constrained MLE.
 
     ## To do this, we need to calculate log-likelihood for any given
     ## candidate k. We then need an estimate of sigma as well
@@ -147,48 +147,49 @@ symmetric.blur <-function(y, kdim = round(dim(y) / 3), resize = 1,
           AIC = 2 * npar - 2 * logL,
           BIC = npar * log(length(Yh2) + length(Yv2)) - 2 * logL)
     }
-    msm <- as.data.frame(t(sapply(seq(max(kdim)-1, 1), kAICsize)))
-    print(msm)
-    pdf(tempfile(tmpdir=".", fileext=".pdf"))
-    plot(AIC ~ size, data = msm)
-    plot(BIC ~ size, data = msm)
-    plot(logL ~ size, data = msm)
-    dev.off()
-
-
-    kAICprop <- function(prop) {
-        ## message(prop)
-        k <- symk.hat
-        k[k < prop * maxk] <- 0
-        npar <- sum(k > 0)
-        Kh <- Mod(rip.dft(k, pad = dim(Yh))) # NOTE: not rip.ndft() here; otherwise
-        Kv <- Mod(rip.dft(k, pad = dim(Yv))) # NOTE: convolution theorem will not hold
-        Lh <- eta.sq * Hh + Wh * Kh^2
-        Lv <- eta.sq * Hv + Wv * Kv^2
-        logL <-
-            sum(dchisq(Yh2 / Lh, df = 1, log = TRUE)) +
-            sum(dchisq(Yv2 / Lv, df = 1, log = TRUE)) -
-            sum(log(Lh)) - sum(log(Lv))
-        c(prop = prop,
-          logL = logL,
-          AIC = 2 * npar - 2 * logL,
-          BIC = npar * log(length(Yh2) + length(Yv2)) - 2 * logL)
+    if (show.msc)
+    {
+        msm <- as.data.frame(t(sapply(seq(max(kdim)-1, 1), kAICsize)))
+        print(msm)
     }
+    ## plot(AIC ~ size, data = msm)
+    ## plot(BIC ~ size, data = msm)
+    ## plot(logL ~ size, data = msm)
+
+    ## using model selection criteria for proportion below which to zap (unused)
+    ## kAICprop <- function(prop) {
+    ##     ## message(prop)
+    ##     k <- symk.hat
+    ##     k[k < prop * maxk] <- 0
+    ##     npar <- sum(k > 0)
+    ##     Kh <- Mod(rip.dft(k, pad = dim(Yh))) # NOTE: not rip.ndft() here; otherwise
+    ##     Kv <- Mod(rip.dft(k, pad = dim(Yv))) # NOTE: convolution theorem will not hold
+    ##     Lh <- eta.sq * Hh + Wh * Kh^2
+    ##     Lv <- eta.sq * Hv + Wv * Kv^2
+    ##     logL <-
+    ##         sum(dchisq(Yh2 / Lh, df = 1, log = TRUE)) +
+    ##         sum(dchisq(Yv2 / Lv, df = 1, log = TRUE)) -
+    ##         sum(log(Lh)) - sum(log(Lv))
+    ##     c(prop = prop,
+    ##       logL = logL,
+    ##       AIC = 2 * npar - 2 * logL,
+    ##       BIC = npar * log(length(Yh2) + length(Yv2)) - 2 * logL)
+    ## }
     if (trim)
     {
-        if (use.AIC)
-        {
-            msm <- as.data.frame(t(sapply(seq(0, 0.1, by = 0.005), kAICprop)))
-            which.aic <- which.min(msm$AIC)
-            aic.prop <- msm$AIC[which.aic]
-            ## keep <- with(msm, unique(c(which.max(logL), which.min(AIC), which.min(BIC))))
-            ## print(msm[keep,])
-            ## print(msm)
-            symk.hat[symk.hat < aic.prop * maxk] <- 0
-            symk.hat <- ktrim0odd(symk.hat)
-        }
-        else 
-            symk.hat <- ktrim0odd(zapsmallp(symk.hat, digits = zap.digits))
+        ## if (FALSE)
+        ## {
+        ##     msm <- as.data.frame(t(sapply(seq(0, 0.1, by = 0.005), kAICprop)))
+        ##     which.aic <- which.min(msm$AIC)
+        ##     aic.prop <- msm$AIC[which.aic]
+        ##     ## keep <- with(msm, unique(c(which.max(logL), which.min(AIC), which.min(BIC))))
+        ##     ## print(msm[keep,])
+        ##     ## print(msm)
+        ##     symk.hat[symk.hat < aic.prop * maxk] <- 0
+        ##     symk.hat <- ktrim0odd(symk.hat)
+        ## }
+        ## else 
+        symk.hat <- ktrim0odd(zapsmallp(symk.hat, digits = zap.digits))
     }    
     if (resize != 1 && resize.mode == "kernel")
         symk.hat <- rip.resize(symk.hat, fx = resize)

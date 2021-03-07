@@ -1,5 +1,14 @@
 
 
+## calculate (approximate) posterior variance (diagonal only) of an
+## estimate x, usually after the final estimate has been obtained
+## using rip.deconv() (the arguments must match for the calculation to
+## be valid).
+
+## NOTE: super-resolution (super.factor > 1) not supported yet,
+## although inpainting (missing pixels) are.
+
+
 posterior.variance <-
     function(y, k, x, lambda, alpha = 2,
              rho = list(along = 0, across = 0),
@@ -14,6 +23,11 @@ posterior.variance <-
     rank.convtype <- if (force.full.rank) "same" else "valid"
     dlatent <- dim(x) # size of latent image
     Tk <- conv2sparse(k, dlatent[1], dlatent[2])
+    if (anyNA(y))
+    {
+        keep <- !is.na(as.vector(y))
+        Tk <- Tk[keep, ]
+    }
     Td.h <- conv2sparse(rip.flip(rip.grad$x), dlatent[1], dlatent[2],
                         conv.type = rank.convtype)
     Td.v <- conv2sparse(rip.flip(rip.grad$y), dlatent[1], dlatent[2],
@@ -30,8 +44,9 @@ posterior.variance <-
         Td.v <- conv2sparse(rip.flip(vconv), dlatent[1] - rank.offset, dlatent[2],
                             conv.type = "same") %*% Td.v
     }
-    ## We only use the diagonal, and getting the full crossproduct is
-    ## expensive.
+    ## We only use the diagonal, because getting (and then inverting)
+    ## the full crossproduct is potentially expensive, especially for
+    ## large blur kernels.
     dcrossprod <- function(x) colSums(x^2)
     if (alpha == 2 && yerror == "normal")
     {
@@ -83,7 +98,8 @@ posterior.variance <-
             dcrossprod(Wh %*% Td.h) + dcrossprod(Wv %*% Td.v)
         )
     }
-    ## NOTE: A is now just the diagonal, not the full
+    ## NOTE: A is now just the diagonal, not the full. Return this as
+    ## a matrix with the same structure as x
     S <- x
     S[] <- 1 / as.vector(A)
     S
