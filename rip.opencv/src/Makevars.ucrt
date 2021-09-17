@@ -1,0 +1,23 @@
+
+CXX_STD=CXX11
+PKG_CPPFLAGS = -I$(LOCAL_SOFT)/include/opencv4
+
+PKG_LIBS = \
+	-lopencv_highgui451 -lopencv_ml451 -lopencv_objdetect451	\
+	-lopencv_photo451 -lopencv_stitching451 -lopencv_video451	\
+	-lopencv_calib3d451 -lopencv_features2d451 -lopencv_dnn451	\
+	-lopencv_flann451 -lopencv_videoio451 -lopencv_imgcodecs451	\
+	-lopencv_imgproc451 -lopencv_core451 -llibopenjp2 -lquirc	\
+	-lprotobuf -lcomctl32 -lgdi32 -lole32 -lsetupapi -lws2_32	\
+	-ljpeg -lwebp -lpng -lz -ltiff -lzstd -llzma -lopengl32		\
+	-lglu32 \
+	-L$(LOCAL_SOFT)/lib/opencv4/3rdparty	
+
+
+all: clean
+
+clean:
+	rm -f $(SHLIB) $(OBJECTS)
+
+
+
