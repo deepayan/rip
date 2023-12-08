@@ -4,6 +4,9 @@
 using namespace cv;
 using namespace Rcpp;
 
+// FIXME TODO For better maintenance, generate these from some kind of
+// more easily editable database, e.g. a CSV file
+
 
 Rcpp::IntegerVector cv_enum_BorderTypes()
 {
@@ -64,6 +67,9 @@ Rcpp::IntegerVector cv_enum_ImreadModes()
 				  _["IMREAD_COLOR"] = (int) IMREAD_COLOR);
     return e;
 }
+
+
+
 
 
 Rcpp::List cv_enum_ColorConversionCodes()
@@ -132,6 +138,80 @@ Rcpp::List cv_enum_ColorConversionCodes()
     return List::create(e1, e2, e3); // unlist() in R
 }
 
+// enums from https://docs.opencv.org/3.4.20/d7/d1b/group__imgproc__misc.html
+
+Rcpp::IntegerVector cv_enum_AdaptiveThresholdTypes() {
+    IntegerVector
+	e = IntegerVector::create(_["ADAPTIVE_THRESH_MEAN_C"] = (int) ADAPTIVE_THRESH_MEAN_C,
+				  _["ADAPTIVE_THRESH_GAUSSIAN_C"] = (int) ADAPTIVE_THRESH_GAUSSIAN_C);
+    return e;
+}
+ 
+Rcpp::IntegerVector cv_enum_DistanceTransformLabelTypes() {
+    IntegerVector
+	e = IntegerVector::create(_["DIST_LABEL_CCOMP"] = (int) DIST_LABEL_CCOMP,
+				  _["DIST_LABEL_PIXEL"] = (int) DIST_LABEL_PIXEL);
+    return e;
+}
+ 
+Rcpp::IntegerVector cv_enum_DistanceTransformMasks() {
+    IntegerVector
+	e = IntegerVector::create(_["DIST_MASK_3"] = (int) DIST_MASK_3,
+				  _["DIST_MASK_5"] = (int) DIST_MASK_5,
+				  _["DIST_MASK_PRECISE"] = (int) DIST_MASK_PRECISE);
+    return e;
+}
+
+Rcpp::IntegerVector cv_enum_DistanceTypes() {
+    IntegerVector
+	e = IntegerVector::create(_["DIST_USER"] = (int) DIST_USER,
+				  _["DIST_L1"] = (int) DIST_L1,
+				  _["DIST_L2"] = (int) DIST_L2,
+				  _["DIST_C"] = (int) DIST_C,
+				  _["DIST_L12"] = (int) DIST_L12,
+				  _["DIST_FAIR"] = (int) DIST_FAIR,
+				  _["DIST_WELSCH"] = (int) DIST_WELSCH,
+				  _["DIST_HUBER"] = (int) DIST_HUBER);
+    return e;
+}
+ 
+Rcpp::IntegerVector cv_enum_FloodFillFlags() {
+    IntegerVector
+	e = IntegerVector::create(_["FLOODFILL_FIXED_RANGE"] = (int) FLOODFILL_FIXED_RANGE,
+				  _["FLOODFILL_MASK_ONLY"] = (int) FLOODFILL_MASK_ONLY);
+    return e;
+}
+
+Rcpp::IntegerVector cv_enum_GrabCutClasses() {
+    IntegerVector
+	e = IntegerVector::create(_["GC_BGD"] = (int) GC_BGD,
+				  _["GC_FGD"] = (int) GC_FGD,
+				  _["GC_PR_BGD"] = (int) GC_PR_BGD,
+				  _["GC_PR_FGD"] = (int) GC_PR_FGD);
+    return e;
+}
+ 
+Rcpp::IntegerVector cv_enum_GrabCutModes() {
+    IntegerVector
+	e = IntegerVector::create(_["GC_INIT_WITH_RECT"] = (int) GC_INIT_WITH_RECT,
+				  _["GC_INIT_WITH_MASK"] = (int) GC_INIT_WITH_MASK,
+				  _["GC_EVAL"] = (int) GC_EVAL,
+				  _["GC_EVAL_FREEZE_MODEL"] = (int) GC_EVAL_FREEZE_MODEL);
+    return e;
+}
+ 
+Rcpp::IntegerVector cv_enum_ThresholdTypes() {
+    IntegerVector
+	e = IntegerVector::create(_["THRESH_BINARY"] = (int) THRESH_BINARY,
+				  _["THRESH_BINARY_INV"] = (int) THRESH_BINARY_INV,
+				  _["THRESH_TRUNC"] = (int) THRESH_TRUNC,
+				  _["THRESH_TOZERO"] = (int) THRESH_TOZERO,
+				  _["THRESH_TOZERO_INV"] = (int) THRESH_TOZERO_INV,
+				  _["THRESH_MASK"] = (int) THRESH_MASK,
+				  _["THRESH_OTSU"] = (int) THRESH_OTSU,
+				  _["THRESH_TRIANGLE"] = (int) THRESH_TRIANGLE);
+    return e;
+}
 
 
 
@@ -161,5 +241,13 @@ RCPP_MODULE(enums)
     function("ImreadModes", &cv_enum_ImreadModes, "OpenCV ImreadModes enum values");
     function("ColorConversionCodes", &cv_enum_ColorConversionCodes,
 	     "OpenCV color conversion enum values");
+    function("AdaptiveThresholdTypes", &cv_enum_AdaptiveThresholdTypes, "OpenCV AdaptiveThresholdTypes enum values");
+    function("DistanceTransformLabelTypes", &cv_enum_DistanceTransformLabelTypes, "OpenCV DistanceTransformLabelTypes enum values");
+    function("DistanceTransformMasks", &cv_enum_DistanceTransformMasks, "OpenCV DistanceTransformMasks enum values");
+    function("DistanceTypes", &cv_enum_DistanceTypes, "OpenCV DistanceTypes enum values");
+    function("FloodFillFlags", &cv_enum_FloodFillFlags, "OpenCV FloodFillFlags enum values");
+    function("GrabCutClasses", &cv_enum_GrabCutClasses, "OpenCV GrabCutClasses enum values");
+    function("GrabCutModes", &cv_enum_GrabCutModes, "OpenCV GrabCutModes enum values");
+    function("ThresholdTypes", &cv_enum_ThresholdTypes, "OpenCV ThresholdTypes enum values");
     function("Misc", &cv_enum_Misc, "OpenCV miscellaneous enum values");
 }

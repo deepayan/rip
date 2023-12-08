@@ -100,6 +100,25 @@ CV_EXPORTS_W void Scharr( InputArray src, OutputArray dst, int ddepth,
 ```
 
 
+TODO next:
+
+```
+CV_EXPORTS_W void Laplacian( InputArray src, OutputArray dst, int ddepth,
+CV_EXPORTS_W void goodFeaturesToTrack( InputArray image, OutputArray corners,
+CV_EXPORTS_W void HoughLines( InputArray image, OutputArray lines,
+CV_EXPORTS_W void HoughLinesP( InputArray image, OutputArray lines,
+CV_EXPORTS_W void HoughCircles( InputArray image, OutputArray circles,
+
+CV_EXPORTS_W double threshold( InputArray src, OutputArray dst,
+CV_EXPORTS_W void adaptiveThreshold( InputArray src, OutputArray dst,
+
+CV_EXPORTS_W void watershed( InputArray image, InputOutputArray markers );
+CV_EXPORTS_W int floodFill( InputOutputArray image, InputOutputArray mask,
+```
+
+
+
+
 Not available:
 
 
@@ -107,14 +126,8 @@ Not available:
 CV_EXPORTS_W Ptr<LineSegmentDetector> createLineSegmentDetector(
 CV_EXPORTS_W void sqrBoxFilter( InputArray _src, OutputArray _dst, int ddepth,
 CV_EXPORTS_W void spatialGradient( InputArray src, OutputArray dx,
-CV_EXPORTS_W void Laplacian( InputArray src, OutputArray dst, int ddepth,
 CV_EXPORTS_W void preCornerDetect( InputArray src, OutputArray dst, int ksize,
-// CV_EXPORTS_W void Canny( InputArray dx, InputArray dy,
 CV_EXPORTS_W void cornerSubPix( InputArray image, InputOutputArray corners,
-CV_EXPORTS_W void goodFeaturesToTrack( InputArray image, OutputArray corners,
-CV_EXPORTS_W void HoughLines( InputArray image, OutputArray lines,
-CV_EXPORTS_W void HoughLinesP( InputArray image, OutputArray lines,
-CV_EXPORTS_W void HoughCircles( InputArray image, OutputArray circles,
 CV_EXPORTS_W void morphologyEx( InputArray src, OutputArray dst,
 CV_EXPORTS_W void remap( InputArray src, OutputArray dst,
 CV_EXPORTS_W void convertMaps( InputArray map1, InputArray map2,
@@ -129,8 +142,6 @@ CV_EXPORTS_W void accumulateProduct( InputArray src1, InputArray src2,
 CV_EXPORTS_W void accumulateWeighted( InputArray src, InputOutputArray dst,
 CV_EXPORTS_W Point2d phaseCorrelate(InputArray src1, InputArray src2,
 CV_EXPORTS_W void createHanningWindow(OutputArray dst, Size winSize, int type);
-CV_EXPORTS_W double threshold( InputArray src, OutputArray dst,
-CV_EXPORTS_W void adaptiveThreshold( InputArray src, OutputArray dst,
 CV_EXPORTS_W void undistort( InputArray src, OutputArray dst,
 CV_EXPORTS_W void initUndistortRectifyMap( InputArray cameraMatrix, InputArray distCoeffs,
 CV_EXPORTS_W float initWideAngleProjMap( InputArray cameraMatrix, InputArray distCoeffs,
@@ -139,10 +150,9 @@ CV_EXPORTS_W void undistortPoints( InputArray src, OutputArray dst,
 CV_EXPORTS_W void calcHist( InputArrayOfArrays images,
 CV_EXPORTS_W void calcBackProject( InputArrayOfArrays images, const std::vector<int>& channels,
 CV_EXPORTS_W double compareHist( InputArray H1, InputArray H2, int method );
-CV_EXPORTS_W void watershed( InputArray image, InputOutputArray markers );
+
 CV_EXPORTS_W void grabCut( InputArray img, InputOutputArray mask, Rect rect,
 CV_EXPORTS_W void distanceTransform( InputArray src, OutputArray dst,
-CV_EXPORTS_W int floodFill( InputOutputArray image, InputOutputArray mask,
 CV_EXPORTS_W void demosaicing(InputArray _src, OutputArray _dst, int code, int dcn = 0);
 CV_EXPORTS_W Moments moments( InputArray array, bool binaryImage = false );
 CV_EXPORTS_W void HuMoments( const Moments& m, OutputArray hu );

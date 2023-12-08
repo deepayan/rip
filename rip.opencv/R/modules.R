@@ -15,6 +15,14 @@ rip.cv <- new.env(parent = emptyenv())
              InterpolationFlags = enums$InterpolationFlags(),
              ImreadModes = enums$ImreadModes(),
              ColorConversionCodes = unlist(enums$ColorConversionCodes()), # see enums.cpp
+             AdaptiveThresholdTypes = enums$AdaptiveThresholdTypes(),
+             DistanceTransformLabelTypes = enums$DistanceTransformLabelTypes(),
+             DistanceTransformMasks = enums$DistanceTransformMasks(),
+             DistanceTypes = enums$DistanceTypes(),
+             FloodFillFlags = enums$FloodFillFlags(),
+             GrabCutClasses = enums$GrabCutClasses(),
+             GrabCutModes = enums$GrabCutModes(),
+             ThresholdTypes = enums$ThresholdTypes(),
              Misc = enums$Misc())
 }
 

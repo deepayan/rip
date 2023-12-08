@@ -1,7 +1,7 @@
 #include "common.h"
 
-using namespace Rcpp;
 using namespace cv;
+using namespace Rcpp;
 
 
 Rcpp::NumericMatrix
@@ -190,6 +190,38 @@ Rcpp::NumericMatrix cv_equalizeHist(Rcpp::NumericMatrix x)
 }
 
 
+
+Rcpp::NumericMatrix
+cv_threshold(Rcpp::NumericMatrix imgMat,
+	    double thresh = 127,
+	    double maxval = 255,
+	    int type = THRESH_BINARY)
+{
+    cv::Mat M = RCPP2CV(imgMat, 5);
+    cv::Mat outImg;
+    double thres = cv::threshold(M, outImg, thresh, maxval, type);
+    if (thres != thresh) Rprintf("Computed threshold: %g\n", thres);
+    // FIXME: TODO add 'thres' as an attribute of the result
+    return (CV2RCPP(outImg));
+}
+
+
+Rcpp::NumericMatrix
+cv_adaptiveThreshold(Rcpp::NumericMatrix imgMat,
+		     double maxval = 255,
+		     int method = ADAPTIVE_THRESH_MEAN_C,
+		     int type = THRESH_BINARY,
+		     int blocksize = 3,
+		     double C = 0.0)
+{
+    cv::Mat M = RCPP2CV(imgMat, 5);
+    cv::Mat outImg;
+    cv::adaptiveThreshold(M, outImg, maxval, method, type, blocksize, C);
+    return (CV2RCPP(outImg));
+}
+
+
+
 RCPP_MODULE(imgproc) 
 {
     function("getStructuringElement", &cv_getStructuringElement,
@@ -214,6 +246,17 @@ RCPP_MODULE(imgproc)
 	     "Convert between colorspaces (default: BGR to grayscale).");
     function("matchTemplate", &cv_matchTemplate, "Template matching");
     function("equalizeHist", &cv_equalizeHist, "Histogram Equalization");
+    function("adaptiveThreshold", &cv_adaptiveThreshold,
+	     List::create(_["x"], _["maxval"] = 255,
+			  _["method"] = (int) ADAPTIVE_THRESH_MEAN_C, 
+			  _["type"] = (int) THRESH_BINARY,
+			  _["blocksize"] = 3, _["C"] = 0.0),
+	     "Adaptive thresholding");
+    function("threshold", &cv_threshold,
+	     List::create(_["x"], _["thresh"] = 127,
+			  _["maxval"] = 255,
+			  _["type"] = (int) THRESH_BINARY),
+	     "Fixed thresholding");
 }
 
 
