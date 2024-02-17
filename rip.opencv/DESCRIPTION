@@ -1,6 +1,6 @@
 Package: rip.opencv
-Version: 0.1-1
-Date: 2020-10-10
+Version: 0.2-0
+Date: 2024-02-17
 Type: Package
 Title: Interface to OpenCV Image Processing Routines
 Authors@R: c(person("Deepayan", "Sarkar", role = c("aut", "cre"),
