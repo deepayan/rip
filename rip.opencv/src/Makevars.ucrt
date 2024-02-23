@@ -1,27 +1,35 @@
 
-CXX_STD=CXX11
-PKG_CPPFLAGS = -I$(LOCAL_SOFT)/include/opencv4
+## CXX_STD=CXX11
 
-PKG_LIBS = -lopencv_photo451 -lopencv_videoio451			\
--lopencv_imgcodecs451 -lamstrmid -lswscale -lavformat -lopenjp2		\
--lgnutls -lbluray -lwbemuuid -luuid -lstrmiids -lksuser -lksguid	\
--ldxguid -ldmoguids -lavcodec -lass -lopencv_imgproc451 -ltasn1		\
--lhogweed -lxvidcore -lx264 -lvpx -lvorbisenc -lvo-amrwbenc		\
--ltheoraenc -lswresample -lspeex -lopus -lopencore-amrwb		\
--lopencore-amrnb -lmp3lame -lopencv_core451 -lxml2 -lnettle -lgmp	\
--lvorbis -ltheoradec -ltheora -lavutil -lopengl32 -logg -lncrypt	\
--lksecdd -lbcrypt -lharfbuzz_too -lfreetype_too -lharfbuzz -lfreetype	\
--lpng16 -lpng -lbz2 -lSDL2 -loleaut32 -lole32 -lidn2 -lcrypt32		\
--lunistring -liconv -lwsock32 -lws2_32 -ltiff -lzstd -lz		\
--lwebpdecoder -lwebp -llzma -ljpeg -fstack-protector			\
--L$(LOCAL_SOFT)/lib/opencv4/3rdparty
+
+PKG_LIBS = $(shell pkg-config --libs opencv4)
+PKG_CPPFLAGS = $(shell pkg-config --cflags opencv4) -L$(LOCAL_SOFT)/lib/opencv4/3rdparty
+
+
+## Without pkg-config, we need some variant of the following
+
+# PKG_CPPFLAGS = -I$(LOCAL_SOFT)/include/opencv4
+
+# PKG_LIBS = -lopencv_photo451 -lopencv_videoio451			\
+# -lopencv_imgcodecs451 -lamstrmid -lswscale -lavformat -lopenjp2		\
+# -lgnutls -lbluray -lwbemuuid -luuid -lstrmiids -lksuser -lksguid	\
+# -ldxguid -ldmoguids -lavcodec -lass -lopencv_imgproc451 -ltasn1		\
+# -lhogweed -lxvidcore -lx264 -lvpx -lvorbisenc -lvo-amrwbenc		\
+# -ltheoraenc -lswresample -lspeex -lopus -lopencore-amrwb		\
+# -lopencore-amrnb -lmp3lame -lopencv_core451 -lxml2 -lnettle -lgmp	\
+# -lvorbis -ltheoradec -ltheora -lavutil -lopengl32 -logg -lncrypt	\
+# -lksecdd -lbcrypt -lharfbuzz_too -lfreetype_too -lharfbuzz -lfreetype	\
+# -lpng16 -lpng -lbz2 -lSDL2 -loleaut32 -lole32 -lidn2 -lcrypt32		\
+# -lunistring -liconv -lwsock32 -lws2_32 -ltiff -lzstd -lz		\
+# -lwebpdecoder -lwebp -llzma -ljpeg -fstack-protector			\
+# -L$(LOCAL_SOFT)/lib/opencv4/3rdparty
 
 
 all: clean
 
 clean:
-	#rm -f $(SHLIB) $(OBJECTS)
-	rm -f $(SHLIB)
+	rm -f $(SHLIB) $(OBJECTS)
+	# rm -f $(SHLIB)
 
 
 
